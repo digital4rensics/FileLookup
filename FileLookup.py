@@ -49,12 +49,7 @@ def main():
     # Verify supplied path exists or die
     if not os.path.exists(args['Path']):
         print "[!] The supplied path does not exist"
-        sys.exit()
-
-    # Verify supplied path exists or die
-    if not os.path.exists(args['Path']):
-        print "[!] The supplied path does not exist"
-        sys.exit()		
+        sys.exit()	
 		
     def doWork(file):		
         results = []
@@ -64,7 +59,8 @@ def main():
         results.append("VirusTotal:\t\t%s" % virustotal(file))		
         results.append("Cymru:\t\t\t%s" % cymru(file))
         results.append("ShadowServer A/V:\t%s" % ss_av(file))
-        results.append("ShadowServer Known:\t%s" % ss_known(file))		
+        results.append("ShadowServer Known:\t%s" % ss_known(file))
+        results.append("Malwr Known:\t\t%s" % malwr(file))		
         results.append("")
 		
         print '\n'.join(results)
@@ -246,7 +242,25 @@ def cymru(file):
     except socket.error:
         result = "Error"
 		
-    return result		
+    return result	
+    
+# Added 11/29/2012 by Keith Gilbert - @digital4rensics
+def malwr(file):
+	"""
+	Return existence of file in Malwr database.
+	site : http://www.malwr.com
+	"""
+	hash = md5(file)
+	url = 'http://malwr.com/analysis/' + hash + '/'
+	try:
+		present = urllib2.urlopen(url).read()
+		for line in present.split('\n'):
+			if line.find("Malwr - Analysis") == 1:
+				return "Matching Report"
+			else:
+				return "No Match"
+	except:
+		return "Error"	
 
 if __name__ == "__main__":
 	main()  
