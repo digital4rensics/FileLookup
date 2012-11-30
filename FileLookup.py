@@ -60,7 +60,8 @@ def main():
         results.append("Cymru:\t\t\t%s" % cymru(file))
         results.append("ShadowServer A/V:\t%s" % ss_av(file))
         results.append("ShadowServer Known:\t%s" % ss_known(file))
-        results.append("Malwr Known:\t\t%s" % malwr(file))		
+        results.append("Malwr Known:\t\t%s" % malwr(file))
+        results.append("ThreatExpert Known:\t%s" % threatexpert(file)) 
         results.append("")
 		
         print '\n'.join(results)
@@ -247,7 +248,7 @@ def cymru(file):
 # Added 11/29/2012 by Keith Gilbert - @digital4rensics
 def malwr(file):
 	"""
-	Return existence of file in Malwr database.
+	Return existence of Report in Malwr database.
 	site : http://www.malwr.com
 	"""
 	hash = md5(file)
@@ -260,7 +261,25 @@ def malwr(file):
 			else:
 				return "No Match"
 	except:
-		return "Error"	
+		return "Error"
+
+# Added 11/29/2012 by Keith Gilbert - @digital4rensics  Note: Greatly increases time required	
+def threatexpert(file):
+	"""
+	Return existence of report in ThreatExpert database.
+	site : http://www.threatexpert.com
+	"""
+	hash = md5(file)
+	url = 'http://threatexpert.com/report.aspx?md5=' + hash
+	try:
+		page = urllib2.urlopen(url).read()
+		for line in page.split('\n'):
+			if line.find("Submission Summary:") == 1:
+				return "Matching Report"
+			else:
+				return "No Match"
+	except:
+		return "Error"
 
 if __name__ == "__main__":
 	main()  
